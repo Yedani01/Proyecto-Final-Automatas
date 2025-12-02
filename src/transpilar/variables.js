@@ -1,73 +1,67 @@
-//importa la funcion
 export function transpilarVariables(code) {
+    let py = code;
 
-    //divide el codigoo en lineas para su verificacion
-    const lineas = code.split("\n");
-    const salida = [];
+    // Son los carecteres paralas  variables php
+    const variableRegex = /\$(\w+)\s*=\s*(.*?);/g;
+     // guarda las coincidencias
+    let match;
+    //Guarda el analisis
+    let resultados = [];
+     // busca el codigo de pehp
+    while ((match = variableRegex.exec(code)) !== null) {
+        let varName = match[1];
+        let value = match[2].trim();
 
-    //recorre cada linea
-    for (let linea of lineas) {
-        const recortar = linea.trim();
+        let tipo = detectarTipo(value);
+        let pythonValue = convertirValor(value, tipo);
 
-        //verificar si es variable de js
-        if (/^(let|var|const)\s+/.test(recortar)) {
+        resultados.push({
+            php: match[0],
+            variable: varName,
+            valorOriginal: value,
+            tipoDetectado: tipo,
+            python: `${varName} = ${pythonValue}`
+        });
 
-            //convertir a pyhton
-            let convertir = recortar
-                .replace(/^(let|var|const)\s+/, "")
-                .replace(/;/g, "");
-
-           
-            //tipos de variables
-            //obtiene valor después de "="
-            let valor = convertir.split("=")[1]?.trim();
-            let tipo = "";
-
-            if (valor) {
-
-                //string
-                if (/^".*"$/g.test(valor) || /^'.*'$/.test(valor)) {
-                    tipo = "str";
-                }
-
-                //entero
-                else if (/^-?\d+$/.test(valor)) {
-                    tipo = "int";
-                }
-
-                //decimal
-                else if (/^-?\d+\.\d+$/.test(valor)) {
-                    tipo = "float";
-                }
-
-                //booleano
-                else if (/^(true|false)$/i.test(valor)) {
-                    tipo = "bool";
-                    convertir = convertir
-                        .replace(/\btrue\b/gi, "True")
-                        .replace(/\bfalse\b/gi, "False");
-                }
-
-                //null
-                else if (/^null$/i.test(valor)) {
-                    tipo = "null";
-                    convertir = convertir.replace(/\bnull\b/gi, "None");
-                }
-            }
-
-            //agrega comentario del tipo si existe
-            if (tipo !== "") {
-                convertir += `  # ${tipo}`;
-            }
-
-            //guarda las nuevas variables
-            salida.push(convertir);
-
-        } else {
-            salida.push(linea);
-        }
+        // Reemplazar en el código a codigo Python
+        py = py.replace(match[0], `${varName} = ${pythonValue}`);
     }
 
-    //devuelve el codigo
-    return salida.join("\n");
+    return { codigo: py, analisis: resultados };
+}
+
+
+function detectarTipo(valor) {
+    if (/^".*"$|^'.*'$/.test(valor)) return "string";
+    if (/^\d+$/.test(valor)) return "int";
+    if (/^\d+\.\d+$/.test(valor)) return "float";
+    if (/^(true|false)$/i.test(valor)) return "boolean";
+    if (/^null$/i.test(valor)) return "null";
+    if (/^\[.*\]$/.test(valor)) return "array";
+    if (/^array\s*\(.*\)$/.test(valor)) return "array_asociativo";
+    return "desconocido";
+}
+
+
+function convertirValor(valor, tipo) {
+    switch (tipo) {
+        case "string":
+            return valor; // igual
+        case "int":
+            return parseInt(valor);
+        case "float":
+            return parseFloat(valor);
+        case "boolean":
+            return valor.toLowerCase() === "true" ? "True" : "False";
+        case "null":
+            return "None";
+        case "array":
+            return valor.replace("[", "[").replace("]", "]");
+        case "array_asociativo":
+            let contenido = valor.replace(/^array\s*\(|\)$/g, "");
+            contenido = contenido.replace(/=>/g, ":");
+            return `{ ${contenido} }`;
+        default:
+            return valor; // sin cambios
+    }
 }

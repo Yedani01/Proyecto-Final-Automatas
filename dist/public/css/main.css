@@ -1,16 +1,75 @@
 body {
-    background: #f5f7fa;
+    background: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+
+.header-bar {
+    background: linear-gradient(90deg, #6a5acd, #836fff);
+    color: white;
+    padding: 35px 20px;
+    border-radius: 0 0 30px 30px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(80, 80, 150, 0.25);
+}
+
+.editor-box {
+    border-radius: 22px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 8px 30px rgba(120, 120, 180, 0.15);
+    border: 1px solid #ececff;
 }
 
 .code-area {
+    background: #fafaff;
+    border: none;
+    color: #333;
+    font-family: "JetBrains Mono", monospace;
     resize: none;
-    border-radius: 0.75rem;
+    border-left: 4px solid #6a5acd;
+    border-right: 4px solid #836fff;
 }
 
-.header-gradient {
-    background: linear-gradient(90deg, #0d6efd, #6610f2);
+.tag {
+    background: #ece8ff;
+    color: #5a42c7;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 35px;
+    margin-right: 8px;
+    font-weight: 600;
+    border: 1px solid #dcd3ff;
+    box-shadow: 0 2px 6px rgba(100, 60, 200, 0.15);
 }
 
-.badge {
-    font-size: 0.75rem;
+.footer-bar {
+    background: #f7f7ff;
+    border-top: 1px solid #e3e0ff;
+    padding: 20px;
+}
+
+button.btn-primary {
+    background: linear-gradient(90deg, #6a5acd, #8a70ff);
+    border: none;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 12px rgba(90, 70, 200, 0.35);
+}
+
+button.btn-primary:hover {
+    background: linear-gradient(90deg, #5948d8, #7e63ff);
+}
+
+button.btn-outline-secondary {
+    border-radius: 10px;
+    font-weight: 600;
+    border-color: #bfb8ff;
+    color: #6a5acd;
+}
+
+button.btn-outline-secondary:hover {
+    background: #ece8ff;
+    border-color: #a29aff;
 }
