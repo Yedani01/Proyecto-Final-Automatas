@@ -1,30 +1,69 @@
-// Transpilador de impresiones (console.log → print)
-
-export function transpilarImpresiones(code) {
-    
-    const lineas = code.split("\n");
-    const salida = [];
+export function transpilarImpresiones(codigo) {
+    const lineas = codigo.split("\n");
+    const resultado = [];
+    const analisis = [];
 
     for (let linea of lineas) {
+        let original = linea.trim();
+        let traducida = linea;
 
-        const recortar = linea.trim();
-
-        // Detectar console.log(...)
-        if (/^console\.log\s*\(/.test(recortar)) {
-
-            let convertir = recortar
-                .replace(/^console\.log\s*\(/, "print(") // convertir console.log → print
-                .replace(/;/g, "")                       // quitar ;
-                .replace(/\btrue\b/g, "True")            // true → True
-                .replace(/\bfalse\b/g, "False")          // false → False
-                .replace(/\bnull\b/g, "None");           // null → None
-
-            salida.push(convertir);
-
-        } else {
-            salida.push(linea);
+        // echo
+        if (/^echo\s+/i.test(original)) {
+            traducida = original
+                .replace(/^echo\s*/i, "print(")
+                .replace(/;$/, ")"); 
+            
+            analisis.push({
+                tipo: "impresión",
+                php: original,
+                python: traducida
+            });
         }
+
+        // print (forma php)
+        else if (/^print\s+/i.test(original)) {
+            traducida = original
+                .replace(/^print\s*/i, "print(")
+                .replace(/;$/, ")");
+
+            analisis.push({
+                tipo: "impresión",
+                php: original,
+                python: traducida
+            });
+        }
+
+        // print_r()
+        else if (/^print_r\s*\(/i.test(original)) {
+            traducida = original
+                .replace(/^print_r\s*\(/i, "print(")
+                .replace(/;$/, "");
+
+            analisis.push({
+                tipo: "impresión",
+                php: original,
+                python: traducida
+            });
+        }
+
+        // var_dump()
+        else if (/^var_dump\s*\(/i.test(original)) {
+            traducida = original
+                .replace(/^var_dump\s*\(/i, "print(")
+                .replace(/;$/, "");
+
+            analisis.push({
+                tipo: "impresión",
+                php: original,
+                python: traducida
+            });
+        }
+
+        resultado.push(traducida);
     }
 
-    return salida.join("\n");
+    return {
+        codigo: resultado.join("\n"),
+        analisis
+    };
 }
